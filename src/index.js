@@ -1,26 +1,70 @@
-module.exports = function() {
-    const args = arguments;
-    let hasSearch = false;
-    let protocolPart = '';
+export default function() {
+    const args = [ ...arguments ];
+    let protocol = '';
     const matches = args[ 0 ].match( /^[^:/]*:\/+/ );
+
     if( matches ) {
-        protocolPart = matches[ 0 ];
-        args[ 0 ] = args[ 0 ].substr( protocolPart.length );
+        protocol = matches[ 0 ];
+        args[ 0 ] = args[ 0 ].substr( protocol.length );
+    } else if( args[ 0 ].indexOf( '//' ) === 0 ) {
+        // for protocol-relative URL
+        protocol = '//';
+        args[ 0 ] = args[ 0 ].substr( 2 );
     }
 
-    let pathPart = [];
-    let searchPart = [];
+    /**
+     * to remove the first empty slice
+     * it might be created if the first argument matches a protocol format like "xxxx:////"
+     */
+    if( !args[ 0 ].length ) args.shift();
 
+    let main = [];
+
+    /**
+     * split the path part out
+     */
     while( args.length ) {
         const arg = args.shift();
         const i = arg.indexOf( '?' );
         if( i > -1 ) {
-            pathPart.push( arg.substr( 0, i ) );
-            arg.unshift( arg.substr( i + 1 ) );
+            main.push( arg.substr( 0, i ) );
+            args.unshift( arg.substr( i + 1 ) );
             break;
         }
-        pathPart.push( arg );
+        main.push( arg );
     }
 
-    return `${protocolPart}${pathPart.join( '/' ).replace( /\/+/g, '/' )}?${searchPart.join( '&' ).replace( /\?/g, '' ).replace( /&/g, '&' ) }`;
+    let search = [];
+
+    let hasSharp = false;
+
+    /**
+     * split the search part out
+     */
+    while( args.length ) {
+        const arg = args.shift();
+        const i = arg.indexOf( '#' );
+        if( i > -1 ) {
+            hasSharp = true;
+            search.push( arg.substr( 0, i ) );
+            args.unshift( arg.substr( i + 1 ) );
+            break;
+        }
+        search.push( arg );
+    }
+
+    /**
+     * replace consecutive shashes with a single one.
+     * remove ending slashes
+     */
+    if( protocol ) {
+        main[ 0 ] = main[ 0 ].replace( /^\/+/, '' );
+    }
+    main = main.join( '/' ).replace( /\/+/g, '/' ).replace( /\/+$/, '' );
+
+    search = search.join( '&' ).replace( /\?/g, '' ).replace( /&+/g, '&' );
+
+    const hash = args.join( '' );
+
+    return `${protocol}${main}?${search}${hasSharp?'#':''}${hash}`;
 }
