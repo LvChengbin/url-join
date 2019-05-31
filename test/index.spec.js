@@ -70,12 +70,15 @@ describe( 'urlJoin', () => {
        expect( join( '/a', undefined, 'b' ) ).toEqual( '/a/b' ); 
     } );
 
-    it( 'should remove the trailing question mark', () => {
+    it( 'should remove the trailing "?"', () => {
         expect( join( '/foo/', '?' ) ).toEqual( '/foo/' );
+        expect( join( '/foo/', '??????' ) ).toEqual( '/foo/' );
+        expect( join( '/foo/', '??????', 'x' ) ).toEqual( '/foo/?x' );
     } );
 
-    it( 'should remove the trailing ampersand mark', () => {
+    it( 'should remove the useless "&"s', () => {
         expect( join( '/foo/', '?x=1', 'y=2&' ) ).toEqual( '/foo/?x=1&y=2' );
+        expect( join( '?&', 'x=1', 'y=2' ) ).toEqual( '?x=1&y=2' );
     } );
 
 } );

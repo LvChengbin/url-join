@@ -79,7 +79,8 @@ function index() {
     search = trim( search ).join( '&' )
         .replace( /\?/g, '' )
         .replace( /&+$/, '' )
-        .replace( /&+/g, '&' );
+        .replace( /&+/g, '&' )
+        .replace( /^&+/g, '' );
 
     search.length && ( mark = '?' );
 

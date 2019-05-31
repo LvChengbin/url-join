@@ -1,6 +1,6 @@
 {
   "name": "@lvchengbin/url-join",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "oin multiple parts of URLs by removing useless slashes and other characters.",
   "main": "dist/url-join.cjs.js",
   "jsnext:main": "src/index.js",
