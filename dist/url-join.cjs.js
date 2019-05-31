@@ -1,7 +1,7 @@
 'use strict';
 
 function index() {
-    const args = [ ...arguments ];
+    const args = [ ...arguments ].filter( x => typeof x !== 'undefined' && x !== null );
     let protocol = '';
     const matches = args[ 0 ].match( /^[^:/]*:\/+/ );
 
@@ -18,9 +18,13 @@ function index() {
      * to remove the first empty slice
      * it might be created if the first argument matches a protocol format like "xxxx:////"
      */
-    if( !args[ 0 ].length ) args.shift();
+    trim( args );
 
     let main = [];
+    let search = [];
+    let mark = '';
+    let sharp = '';
+    let endslash = '';
 
     /**
      * split the path part out
@@ -36,9 +40,15 @@ function index() {
         main.push( arg );
     }
 
-    let search = [];
+    trim( main );
 
-    let hasSharp = false;
+    try {
+        const last = main[ main.length - 1 ];
+        if( last.charAt( last.length - 1 ) === '/' ) {
+            endslash = '/';
+        }
+    } catch( e ){ endslash = ''; }
+
 
     /**
      * split the search part out
@@ -47,7 +57,7 @@ function index() {
         const arg = args.shift();
         const i = arg.indexOf( '#' );
         if( i > -1 ) {
-            hasSharp = true;
+            sharp = '#';
             search.push( arg.substr( 0, i ) );
             args.unshift( arg.substr( i + 1 ) );
             break;
@@ -62,13 +72,25 @@ function index() {
     if( protocol ) {
         main[ 0 ] = main[ 0 ].replace( /^\/+/, '' );
     }
-    main = main.join( '/' ).replace( /\/+/g, '/' ).replace( /\/+$/, '' );
+    main = main.join( '/' )
+        .replace( /\/+/g, '/' )
+        .replace( /\/+$/, '' );
 
-    search = search.join( '&' ).replace( /\?/g, '' ).replace( /&+/g, '&' );
+    search = trim( search ).join( '&' )
+        .replace( /\?/g, '' )
+        .replace( /&+$/, '' )
+        .replace( /&+/g, '&' );
+
+    search.length && ( mark = '?' );
 
     const hash = args.join( '' );
+    return `${protocol}${main}${endslash}${mark}${search}${sharp}${hash}`;
+}
 
-    return `${protocol}${main}?${search}${hasSharp?'#':''}${hash}`;
+function trim( arr ) {
+    arr[ 0 ] || arr.shift();
+    arr[ arr.length - 1 ] || arr.pop();
+    return arr;
 }
 
 module.exports = index;

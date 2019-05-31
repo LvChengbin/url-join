@@ -7,10 +7,14 @@
     "globals" : {
         "define" : true,
         "describe" : true,
+        "xdescribe" : true,
         "it" : true,
+        "xit" : true,
         "expect" : true,
-        "J" : true,
-        "Jaunty" : true
+        "beforeAll" : true,
+        "beforeEach" : true,
+        "afterAll" : true,
+        "afterEach" : true
     },
     "extends": "eslint:recommended",
     "parserOptions": {
@@ -25,6 +29,5 @@
         ],
         "quotes": [ "error", "single" ],
         "semi": [ 0 ]
-        //"indent": [2, 4, {"SwitchCase": 1}]
     }
 }

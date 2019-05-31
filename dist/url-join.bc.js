@@ -8,7 +8,7 @@
         var i$2 = arguments.length, argsArray = Array(i$2);
         while ( i$2-- ) argsArray[i$2] = arguments[i$2];
 
-        var args = [].concat( argsArray );
+        var args = [].concat( argsArray ).filter( function (x) { return typeof x !== 'undefined' && x !== null; } );
         var protocol = '';
         var matches = args[ 0 ].match( /^[^:/]*:\/+/ );
 
@@ -25,9 +25,13 @@
          * to remove the first empty slice
          * it might be created if the first argument matches a protocol format like "xxxx:////"
          */
-        if( !args[ 0 ].length ) { args.shift(); }
+        trim( args );
 
         var main = [];
+        var search = [];
+        var mark = '';
+        var sharp = '';
+        var endslash = '';
 
         /**
          * split the path part out
@@ -43,9 +47,15 @@
             main.push( arg );
         }
 
-        var search = [];
+        trim( main );
 
-        var hasSharp = false;
+        try {
+            var last = main[ main.length - 1 ];
+            if( last.charAt( last.length - 1 ) === '/' ) {
+                endslash = '/';
+            }
+        } catch( e ){ endslash = ''; }
+
 
         /**
          * split the search part out
@@ -54,7 +64,7 @@
             var arg$1 = args.shift();
             var i$1 = arg$1.indexOf( '#' );
             if( i$1 > -1 ) {
-                hasSharp = true;
+                sharp = '#';
                 search.push( arg$1.substr( 0, i$1 ) );
                 args.unshift( arg$1.substr( i$1 + 1 ) );
                 break;
@@ -69,13 +79,25 @@
         if( protocol ) {
             main[ 0 ] = main[ 0 ].replace( /^\/+/, '' );
         }
-        main = main.join( '/' ).replace( /\/+/g, '/' ).replace( /\/+$/, '' );
+        main = main.join( '/' )
+            .replace( /\/+/g, '/' )
+            .replace( /\/+$/, '' );
 
-        search = search.join( '&' ).replace( /\?/g, '' ).replace( /&+/g, '&' );
+        search = trim( search ).join( '&' )
+            .replace( /\?/g, '' )
+            .replace( /&+$/, '' )
+            .replace( /&+/g, '&' );
+
+        search.length && ( mark = '?' );
 
         var hash = args.join( '' );
+        return ("" + protocol + main + endslash + mark + search + sharp + hash);
+    }
 
-        return ("" + protocol + main + "?" + search + (hasSharp?'#':'') + hash);
+    function trim( arr ) {
+        arr[ 0 ] || arr.shift();
+        arr[ arr.length - 1 ] || arr.pop();
+        return arr;
     }
 
     return index;
