@@ -11,12 +11,10 @@ describe( 'urlJoin', () => {
     } );
 
     it( 'should be able to join protocol', () => {
-        
         expect( join( 'http://', 'www.google.com/', 'foo/bar', '?test=123' ) ).toEqual( 'http://www.google.com/foo/bar?test=123' ); 
     } );
 
     it( 'should remove the starting slashes while joining with protocol', () => {
-        
         expect( join( 'http://', '/www.google.com/', 'foo/bar', '?test=123' ) ).toEqual( 'http://www.google.com/foo/bar?test=123' ); 
     } );
 
@@ -30,7 +28,16 @@ describe( 'urlJoin', () => {
     } );
 
     it( 'should not remove slashes in search string', () => {
-
         expect( join( 'http://', 'www.google.com///', '//foo/bar', '?test=123///' ) ).toEqual( 'http://www.google.com/foo/bar?test=123///' ); 
+    } );
+
+    it( 'should support absolute path', () => {
+        expect( join( '/foo/bar', '?test=123///' ) ).toEqual( '/foo/bar?test=123///' ); 
+    } );
+
+    it( 'should support anchors in URLs', () => {
+        expect( join( 'http://', 'www.google.com///', '//foo/bar', '?test=123///#x', 'y' ) ).toEqual( 'http://www.google.com/foo/bar?test=123///#xy' ); 
+
+        expect( join( 'http://', 'www.google.com///', '//foo/bar', '?test=123///x', '#y' ) ).toEqual( 'http://www.google.com/foo/bar?test=123///x#y' ); 
     } );
 } );
