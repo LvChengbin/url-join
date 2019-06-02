@@ -76,6 +76,14 @@ function index() {
         .replace( /\/+/g, '/' )
         .replace( /\/+$/, '' );
 
+    const dotdot = /\/[^/]+\/\.\.|[^/]+\/\.\.\//;
+
+    while( main.match( dotdot ) ) {
+        main = main.replace( dotdot, '' );
+    }
+
+    main = main.replace( /\.\//g, '' ); // remove ./ 
+
     search = trim( search ).join( '&' )
         .replace( /\?/g, '' )
         .replace( /&+$/, '' )

@@ -81,4 +81,14 @@ describe( 'urlJoin', () => {
         expect( join( '?&', 'x=1', 'y=2' ) ).toEqual( '?x=1&y=2' );
     } );
 
+    it( 'should normalize url with "./"', () => {
+        expect( join( 'a', '.', 'b' ) ).toEqual( 'a/b' );
+        expect( join( 'a/./b' ) ).toEqual( 'a/b' );
+    } );
+
+    it( 'should normalize url with "../"', () => {
+        expect( join( '/a', '..', 'b' ) ).toEqual( '/b' );
+        expect( join( '/a/b', '../c' ) ).toEqual( '/a/c' );
+    } );
+
 } );
